@@ -2,8 +2,8 @@
 
 module Lib where
 
-import Data.Text as T
-import Data.Time.Calendar as Cal
+import qualified Data.Text as T
+import qualified Data.Time.Calendar as Cal
 
 data Task = Task Name Priority Date (Maybe Date) Info
   deriving Eq
@@ -25,12 +25,30 @@ instance Show Task where
           <> "\nDeadline: " <> T.pack (show dl)
     in T.unpack y
 
-exampleTasks :: [Task]
-exampleTasks =
-  [ Task "HPSched" Medium (Cal.fromGregorian 2020 11 1) Nothing "Tinker with HPSched prototype"
-  , Task "Electronics Project" High (Cal.fromGregorian 2020 11 1) (Just $ Cal.fromGregorian 2020 11 3) "Complete simulations of the rectifier module"
-  , Task "OS Project" Low (Cal.fromGregorian 2020 11 1) (Just $ Cal.fromGregorian 2020 11 25) "Check out the description for OS class project #2"
-  ]
+overdueTasks :: Date -> [Task] -> [Task]
+overdueTasks date =
+  filter (\(Task _ _ nd _ _) -> nd < date)
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+daysTasks :: Date -> [Task] -> [Task]
+daysTasks date =
+  filter (\(Task _ _ nd _ _) -> nd == date)
+
+priority2days :: Priority -> Integer
+priority2days Low = 7
+priority2days Medium = 3
+priority2days High = 1
+
+-- Execute a given task on a given day
+-- If there is a deadline and the new date for
+-- the task surpasses the deadline, then Nothing is returned
+-- If the new date does not surpass the deadline or
+-- there is no deadline, the task with the date and information
+-- adjusted is returned
+doTask :: Cal.Day -> Maybe Info -> Task -> Maybe Task
+doTask d mi (Task n p nd dl i) =
+  let nd' = Cal.addDays (priority2days p) d
+      i' = maybe i id mi
+   in case (> nd') <$> dl of
+        Nothing -> Just $ Task n p nd' dl i'
+        Just True -> Just $ Task n p nd' dl i'
+        Just False -> Nothing
