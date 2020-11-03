@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6581759b9633af80e59b112e0890de14b68b71c3e6397890c4ed5f5c942b7a50
+-- hash: eac2065c9920f243d6762f48cd7f6d36f3cf76e0ad0cfa97027f312f8a9f3c3d
 
 name:           hpsched
 version:        0.1.0.0
@@ -33,7 +33,10 @@ library
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , aeson-pretty
+    , base >=4.7 && <5
+    , bytestring
     , haskeline
     , mtl
     , text
@@ -48,7 +51,10 @@ executable hpsched-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , aeson-pretty
+    , base >=4.7 && <5
+    , bytestring
     , haskeline
     , hpsched
     , mtl
@@ -65,7 +71,10 @@ test-suite hpsched-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , aeson-pretty
+    , base >=4.7 && <5
+    , bytestring
     , haskeline
     , hpsched
     , mtl

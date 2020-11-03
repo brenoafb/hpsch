@@ -1,19 +1,28 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric #-}
 
 module Lib where
 
 import qualified Data.Text as T
 import qualified Data.Time.Calendar as Cal
+import GHC.Generics
+import Data.Aeson
+import Data.Aeson.Encode.Pretty
 
-data Task = Task Name Priority Date (Maybe Date) Info
-  deriving Eq
+data Task = Task
+  { name :: Name
+  , priority :: Priority
+  , date :: Date
+  , deadline :: Maybe Date
+  , info :: Info
+  } deriving (Generic, Eq)
 
 type Name = T.Text
 
 type Date = Cal.Day
 
 data Priority = Low | Medium | High
-  deriving (Ord, Eq, Show)
+  deriving (Generic, Ord, Eq, Show)
 
 type Info = T.Text
 
@@ -23,7 +32,21 @@ instance Show Task where
           <> "\nPriority: " <> T.pack (show p)
           <> "\nNext date: " <> T.pack (show nd)
           <> "\nDeadline: " <> T.pack (show dl)
+          <> "\nInfo: " <> i
     in T.unpack y
+
+instance ToJSON Task where
+  toJSON = genericToJSON defaultOptions
+    { omitNothingFields = True }
+
+instance FromJSON Task where
+  parseJSON = genericParseJSON defaultOptions
+    { omitNothingFields = True }
+
+instance ToJSON Priority where
+    toEncoding = genericToEncoding defaultOptions
+
+instance FromJSON Priority
 
 overdueTasks :: Date -> [Task] -> [Task]
 overdueTasks date =
@@ -48,7 +71,7 @@ doTask :: Cal.Day -> Maybe Info -> Task -> Maybe Task
 doTask d mi (Task n p nd dl i) =
   let nd' = Cal.addDays (priority2days p) d
       i' = maybe i id mi
-   in case (> nd') <$> dl of
+   in case (>= nd') <$> dl of
         Nothing -> Just $ Task n p nd' dl i'
         Just True -> Just $ Task n p nd' dl i'
         Just False -> Nothing

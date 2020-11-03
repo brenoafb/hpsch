@@ -25,6 +25,9 @@ dependencies:
 - time
 - haskeline
 - mtl
+- aeson
+- aeson-pretty
+- bytestring
 
 library:
   source-dirs: src
