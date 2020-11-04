@@ -5,13 +5,14 @@ module Lib where
 
 import qualified Data.Text as T
 import qualified Data.Time.Calendar as Cal
+import Data.Maybe (fromMaybe)
 import GHC.Generics
 import Data.Aeson
 import Data.Aeson.Encode.Pretty
 
 data Task = Task
   { name :: Name
-  , priority :: Priority
+  , interval :: Integer
   , date :: Date
   , deadline :: Maybe Date
   , info :: Info
@@ -21,19 +22,16 @@ type Name = T.Text
 
 type Date = Cal.Day
 
-data Priority = Low | Medium | High
-  deriving (Generic, Ord, Eq, Show)
-
 type Info = T.Text
 
 instance Show Task where
-  show (Task n p nd dl i) = let
-    y = n <> " - " <> i
-          <> "\nPriority: " <> T.pack (show p)
-          <> "\nNext date: " <> T.pack (show nd)
-          <> "\nDeadline: " <> T.pack (show dl)
-          <> "\nInfo: " <> i
-    in T.unpack y
+  show t = T.unpack text
+    where
+      deadlineStr = maybe "" (\x -> "\nDeadline: " <> T.pack (show x)) (deadline t)
+      text = name t <> " - " <> info t
+        <> "\nInterval: " <> T.pack (show $ interval t)
+        <> "\nNext date: " <> T.pack (show $ date t)
+        <> deadlineStr
 
 instance ToJSON Task where
   toJSON = genericToJSON defaultOptions
@@ -43,23 +41,13 @@ instance FromJSON Task where
   parseJSON = genericParseJSON defaultOptions
     { omitNothingFields = True }
 
-instance ToJSON Priority where
-    toEncoding = genericToEncoding defaultOptions
-
-instance FromJSON Priority
-
 overdueTasks :: Date -> [Task] -> [Task]
-overdueTasks date =
-  filter (\(Task _ _ nd _ _) -> nd < date)
+overdueTasks date' =
+  filter (\task -> date task < date')
 
 daysTasks :: Date -> [Task] -> [Task]
-daysTasks date =
-  filter (\(Task _ _ nd _ _) -> nd == date)
-
-priority2days :: Priority -> Integer
-priority2days Low = 7
-priority2days Medium = 3
-priority2days High = 1
+daysTasks date' =
+  filter (\task -> date task < date')
 
 -- Execute a given task on a given day
 -- If there is a deadline and the new date for
@@ -68,10 +56,10 @@ priority2days High = 1
 -- there is no deadline, the task with the date and information
 -- adjusted is returned
 doTask :: Cal.Day -> Maybe Info -> Task -> Maybe Task
-doTask d mi (Task n p nd dl i) =
-  let nd' = Cal.addDays (priority2days p) d
-      i' = maybe i id mi
-   in case (>= nd') <$> dl of
-        Nothing -> Just $ Task n p nd' dl i'
-        Just True -> Just $ Task n p nd' dl i'
+doTask d mi task =
+  let nd' = Cal.addDays (interval task) d
+      -- i' = maybe (info task) id mi
+      i' = fromMaybe (info task) mi
+   in case (>= nd') <$> deadline task of
         Just False -> Nothing
+        _ -> Just $ task { date = nd', info = i' }
