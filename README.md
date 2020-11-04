@@ -18,26 +18,26 @@ like the example.
 ```
 [
     {
-        "priority": "Low",
+        "interval": 7,
         "date": "2020-11-04",
         "name": "Nielsen's DL Book",
         "info": "Continue reading second half of chapter 1"
     },
     {
-        "priority": "High",
+        "interval": 1,
         "date": "2020-11-04",
         "name": "Daily programming practice",
         "info": "Do programming problems for 30 minutes"
     },
     {
-        "priority": "Medium",
+        "interval": 3,
         "date": "2020-11-03",
         "name": "Automata Theory Book",
         "info": "Continue reading second half of chapter 3"
     },
     {
         "name": "OS Project",
-        "priority": "Low",
+        "interval": 7,
         "date": "2020-11-01",
         "deadline": "2020-11-25",
         "info": "Check out the description for OS class project #2"
@@ -48,10 +48,7 @@ like the example.
 A task has five fields:
 
 - Name: The name of the task or project
-- Priority: Defines how many days later the task will pop up again
-  - Low: Every 7 days
-  - Medium: Every 3 days
-  - High: Every day
+- Interval: Defines in how many days the task will pop up again
 - Date: The next date in which the task will show up
   If the task is overdue, it will show up the next
   time you run the program.
@@ -65,11 +62,13 @@ You then have a few options:
 - `D`: finish task and maintain current description
 - `x`: set task aside
 - `l`: push task to end of queue
+- `i`: modify the interval for the current task
 - `q`: quit (pending tasks are delegated)
+- `?`: show commands
 
 When a task is finished, unless the deadline is surpassed,
 will show up in a number of days from now dictated by it's
-priority.
+interval.
 When you set a task aside, it will show up the next time
 you run the program.
 When you push a task to the end of the queue, it will show
