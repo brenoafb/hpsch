@@ -28,6 +28,7 @@ dependencies:
 - aeson
 - aeson-pretty
 - bytestring
+- containers
 
 library:
   source-dirs: src

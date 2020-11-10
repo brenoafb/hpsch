@@ -1,0 +1,28 @@
+[
+   {
+      "priority":"Medium",
+      "date":"2020-11-02",
+      "name":"HPSched",
+      "info":"Tinker with HPSched prototype"
+   },
+   {
+      "priority":"High",
+      "date":"2020-11-02",
+      "name":"Electronics Project",
+      "deadline":"2020-11-03",
+      "info":"Complete simulations of 2nd supply project"
+   },
+   {
+      "priority":"Low",
+      "date":"2020-11-01",
+      "name":"OS Project",
+      "deadline":"2020-11-25",
+      "info":"Check out the description for OS class project #2"
+   },
+   {
+      "priority":"Low",
+      "date":"2020-11-04",
+      "name":"Nielsen's DL Book",
+      "info":"Continue reading second half of chapter 2"
+   }
+]
