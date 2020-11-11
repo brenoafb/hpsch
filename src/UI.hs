@@ -7,11 +7,10 @@ import Lib
 import qualified Data.Text as T
 import qualified Data.List as L
 import qualified Data.Map as M
-import qualified Data.Time.Calendar as Cal
-import qualified Data.Time.Clock as Cl
 import qualified System.Console.Haskeline as Hl
 import qualified Data.ByteString.Lazy as B
 
+import Data.Time
 import Text.Read (readMaybe)
 
 import Control.Monad.State
@@ -64,8 +63,8 @@ printList :: Show a => [a] -> IO ()
 printList xs =
   mapM_ putStr $ L.intersperse "\n\n" (map show xs) ++ ["\n"]
 
-getDay :: IO Cal.Day
-getDay = Cl.utctDay <$> Cl.getCurrentTime
+getDay :: IO Day
+getDay = localDay . zonedTimeToLocalTime <$> getZonedTime
 
 actions :: M.Map Char Action
 actions = buildActionMap
