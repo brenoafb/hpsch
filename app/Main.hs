@@ -20,10 +20,15 @@ import Control.Monad.Identity
 import Data.Aeson
 import Data.Aeson.Encode.Pretty
 import Data.Time
+import System.Directory
+
 
 main :: IO ()
 main = do
-  tasksM <- decodeFileStrict' "tasklist" :: IO (Maybe [Task])
+  home <- getHomeDirectory
+  let tasklistFile = home ++ "/.local/hpsch/tasklist"
+      backupsDir   = home ++ "/.local/hpsch/backups/"
+  tasksM <- decodeFileStrict' tasklistFile :: IO (Maybe [Task])
   case tasksM of
     Nothing -> putStrLn "Error reading input file"
     Just tasks -> do
@@ -35,8 +40,8 @@ main = do
       putStrLn "Done!"
       let tasks' = remainingTasks ++ done taskState' ++ delegated taskState'
       timestamp <- getTimestamp
-      B.writeFile ("backups/tasklist-backup-" ++ timestamp) $ encodePretty tasks
-      B.writeFile "tasklist" $ encodePretty tasks'
+      B.writeFile (backupsDir ++ "tasklist-backup-" ++ timestamp) $ encodePretty tasks
+      B.writeFile tasklistFile $ encodePretty tasks'
       return ()
 
 getTimestamp :: IO String
