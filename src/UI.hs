@@ -152,4 +152,13 @@ actions = buildActionMap
       , handler = \cont ->
           modify $ \taskState -> taskState { delegated = current taskState, current = [] }
       }
+  , Action
+      { key = 'L'
+      , description = "List today's pending tasks"
+      , handler = \cont ->
+        lift (Hl.outputStrLn "\nToday's tasks:")
+          >> gets current
+          >>= mapM_ (lift . Hl.outputStrLn . T.unpack . name)
+          >> cont
+      }
   ]
