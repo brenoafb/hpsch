@@ -70,7 +70,7 @@ actions :: M.Map Char Action
 actions = buildActionMap
   [ Action
       { key = 'd'
-      , description = "Complete task and edit task description"
+      , description = "Edit current task's description"
       , handler = \cont -> do
           tasks' <- gets current
           if null tasks' then cont
@@ -78,8 +78,8 @@ actions = buildActionMap
               let (task:tasks) = tasks'
               newInfo <- lift $ (T.pack <$>) <$> Hl.getInputLine "New info: "
               today <- liftIO getDay
-              let task' = doTask today newInfo task
-              modify $ \taskState -> taskState { done = task' <:> done taskState, current = tasks }
+              let task' = maybe task (\info' -> task { info = info' }) newInfo
+              modify $ \taskState -> taskState { current = task':tasks }
               cont
       }
   , Action
